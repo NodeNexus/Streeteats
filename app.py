@@ -281,7 +281,7 @@ def get_avg_price_index_all_materials(base_date, current_date, region):
     if indices:
         return round(sum(indices) / len(indices), 2)
     else:
-        return None
+        return 0.0
 
 def get_avg_quality_index_all_materials(base_date, current_date, region):
     conn = sqlite3.connect(DATABASE)
