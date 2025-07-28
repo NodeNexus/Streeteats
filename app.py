@@ -282,38 +282,34 @@ def add_sample_data():
 #         return round(sum(indices) / len(indices), 2)
 #     else:
 #         return 0.0
-def get_avg_price_index_all_materials(base_date, current_date, region):
-    conn = sqlite3.connect(DATABASE)
+
+def get_avg_price_index_all_materials(base_date, current_date, region_id):
+    conn = sqlite3.connect(DATABASE)  # change this to your actual DB
     cursor = conn.cursor()
-    
+
+    # Get avg_price for base_date
     cursor.execute('''
-        SELECT 
-            base.material_id,
-            base.avg_price AS base_price,
-            current.avg_price AS current_price
-        FROM 
-            daily_market_data base
-        LEFT JOIN 
-            daily_market_data current 
-        ON 
-            base.material_id = current.material_id
-            AND base.region_id = current.region_id
-            AND current.date = ?
-        WHERE 
-            base.date = ? AND base.region_id = ?
-    ''', (current_date, base_date, region))
-    
-    rows = cursor.fetchall()
+        SELECT AVG(avg_price)
+        FROM daily_market_data
+        WHERE date = ? AND region_id = ?
+    ''', (base_date, region_id))
+    base_avg = cursor.fetchone()[0]
+
+    # Get avg_price for current_date
+    cursor.execute('''
+        SELECT AVG(avg_price)
+        FROM daily_market_data
+        WHERE date = ? AND region_id = ?
+    ''', (current_date, region_id))
+    current_avg = cursor.fetchone()[0]
+
     conn.close()
 
-    indices = [
-        (current_price / base_price) * 100
-        for _, base_price, current_price in rows
-        if current_price and base_price and base_price != 0
-    ]
-    
-    return round(sum(indices) / len(indices), 2) if indices else 0.0
-
+    if base_avg and current_avg and base_avg > 0:
+        index = current_avg / base_avg
+        return round(index, 2)
+    else:
+        return 0.0
 
 
 
