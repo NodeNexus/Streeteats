@@ -249,6 +249,39 @@ def add_sample_data():
     print("Sample data added successfully")
 ## End of sample data loader functions
 ###############
+# def get_avg_price_index_all_materials(base_date, current_date, region):
+#     conn = sqlite3.connect(DATABASE)
+#     cursor = conn.cursor()
+    
+#     cursor.execute('''
+#         SELECT 
+#             base.material_id,
+#             base.avg_price AS base_price,
+#             current.avg_price AS current_price
+#         FROM 
+#             daily_market_data base
+#         JOIN 
+#             daily_market_data current 
+#         ON 
+#             base.material_id = current.material_id
+#         WHERE 
+#             base.date = ? AND current.date = ? AND current.region_id = ?
+#     ''', (base_date, current_date, region))
+    
+#     rows = cursor.fetchall()
+#     conn.close()
+    
+#     indices = []
+#     for row in rows:
+#         material_id, base_price, current_price = row
+#         if base_price and current_price and base_price != 0:
+#             index = (current_price / base_price) * 100
+#             indices.append(index)
+    
+#     if indices:
+#         return round(sum(indices) / len(indices), 2)
+#     else:
+#         return 0.0
 def get_avg_price_index_all_materials(base_date, current_date, region):
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
@@ -264,6 +297,7 @@ def get_avg_price_index_all_materials(base_date, current_date, region):
             daily_market_data current 
         ON 
             base.material_id = current.material_id
+            AND base.region_id = current.region_id   -- ✅ Ensure same region
         WHERE 
             base.date = ? AND current.date = ? AND current.region_id = ?
     ''', (base_date, current_date, region))
@@ -271,17 +305,15 @@ def get_avg_price_index_all_materials(base_date, current_date, region):
     rows = cursor.fetchall()
     conn.close()
     
-    indices = []
-    for row in rows:
-        material_id, base_price, current_price = row
-        if base_price and current_price and base_price != 0:
-            index = (current_price / base_price) * 100
-            indices.append(index)
+    indices = [
+        (current_price / base_price) * 100
+        for _, base_price, current_price in rows
+        if base_price and current_price and base_price != 0
+    ]
     
-    if indices:
-        return round(sum(indices) / len(indices), 2)
-    else:
-        return 0.0
+    return round(sum(indices) / len(indices), 2) if indices else 0.0
+
+
 
 def get_avg_quality_index_all_materials(base_date, current_date, region):
     conn = sqlite3.connect(DATABASE)
