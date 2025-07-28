@@ -439,22 +439,11 @@ def dashboard_data():
         current_date=(today - timedelta(days=days)).strftime('%Y-%m-%d'),
         region=r_id
     )
-    
-    if index_last is not None and index is not None and index_last != 0:
-    percent_change = (index - index_last) / index_last * 100
-        if percent_change < 0:
-            L = f"-₹{abs(percent_change):.2f}"
-        else:
-            L = f"+₹{percent_change:.2f}"
+    L = str((index_last - index)/ index_last * 100 if index_last else 0)
+    if int(float(L)) < 0:
+        L = "-₹"+L[1:L.index('.')+3]
     else:
-    L = "₹0.00"
-
-
-    if L:
-        if float(L) < 0.0:
-            L = "-₹"+L[1:L.index('.')+3]
-        else:
-            L = "+₹"+L[:L.index('.')+3]
+        L = "+₹"+L[:L.index('.')+3]
     
     summary = {
     'avg_price_index': float(index or 0),  # Default to 0 if index is None
