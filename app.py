@@ -440,10 +440,11 @@ def dashboard_data():
         region=r_id
     )
     L = str((index_last - index)/ index_last * 100 if index_last else 0)
-    if int(float(L)) < 0:
-        L = "-₹"+L[1:L.index('.')+3]
+
+    if index_last and index is not None:
+    L = str((index_last - index) / index_last * 100)
     else:
-        L = "+₹"+L[:L.index('.')+3]
+    L = "0"
     
     summary = {
     'avg_price_index': float(index or 0),  # Default to 0 if index is None
