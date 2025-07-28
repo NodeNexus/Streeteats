@@ -442,7 +442,7 @@ def dashboard_data():
     L = str((index_last - index)/ index_last * 100 if index_last else 0)
 
     if L:
-        if int(float(L)) < 0:
+        if float(L) < 0.0:
             L = "-₹"+L[1:L.index('.')+3]
         else:
             L = "+₹"+L[:L.index('.')+3]
