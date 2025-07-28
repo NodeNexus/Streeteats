@@ -293,25 +293,27 @@ def get_avg_price_index_all_materials(base_date, current_date, region):
             current.avg_price AS current_price
         FROM 
             daily_market_data base
-        JOIN 
+        LEFT JOIN 
             daily_market_data current 
         ON 
             base.material_id = current.material_id
-            AND base.region_id = current.region_id   -- ✅ Ensure same region
+            AND base.region_id = current.region_id
+            AND current.date = ?
         WHERE 
-            base.date = ? AND current.date = ? AND current.region_id = ?
-    ''', (base_date, current_date, region))
+            base.date = ? AND base.region_id = ?
+    ''', (current_date, base_date, region))
     
     rows = cursor.fetchall()
     conn.close()
-    
+
     indices = [
         (current_price / base_price) * 100
         for _, base_price, current_price in rows
-        if base_price and current_price and base_price != 0
+        if current_price and base_price and base_price != 0
     ]
     
     return round(sum(indices) / len(indices), 2) if indices else 0.0
+
 
 
 
