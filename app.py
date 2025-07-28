@@ -426,28 +426,31 @@ def dashboard_data():
     base_date = (today - timedelta(days=days)).strftime('%Y-%m-%d')
     current_date = today.strftime('%Y-%m-%d')
 
-    # Pehle waala index
     index = get_avg_price_index_all_materials(
-        base_date=base_date,
-        current_date=current_date,
-        region=r_id
-    )
+    base_date=base_date,
+    current_date=current_date,
+    region=r_id
+)
 
-    # Pichhla waala index
     index_last = get_avg_price_index_all_materials(
-        base_date=(today - timedelta(days=2 * days)).strftime('%Y-%m-%d'),
-        current_date=(today - timedelta(days=days)).strftime('%Y-%m-%d'),
-        region=r_id
-    )
-    L = str((index_last - index)/ index_last * 100 if index_last else 0)
-    if int(float(L)) < 0:
-        L = "-₹"+L[1:L.index('.')+3]
+    base_date=(today - timedelta(days=2 * days)).strftime('%Y-%m-%d'),
+    current_date=(today - timedelta(days=days)).strftime('%Y-%m-%d'),
+    region=r_id
+)
+
+# Safe handling for zero division
+    if index_last and index_last != 0:
+        percent_change = ((index - index_last) / index_last) * 100
     else:
-        L = "+₹"+L[:L.index('.')+3]
+        percent_change = 0.0
+
+# Format as currency-like string with sign and two decimal places
+    sign = "+" if percent_change >= 0 else "-"
+    formatted_change = f"{sign}₹{abs(percent_change):.2f}"
     
     summary = {
     'avg_price_index': float(index or 0),  # Default to 0 if index is None
-    'avg_price_index_percent': str(L),  # Default to 0 if index is None
+    'avg_price_index_percent': str(formatted_change),  # Default to 0 if index is None
     'avg_price_trend': 'up' if index > 0 else 'down',  # Example
     'quality_score': int(stats['avg_quality']),
     'availability': int(stats['avg_availability']),
