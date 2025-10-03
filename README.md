@@ -1,6 +1,6 @@
-# SreetEats  
+# StreetEats  
 
-**SreetEats** is a simple and user-friendly dashboard designed to help **small street vendors** manage their **vegetable stock values** and directly connect with **suppliers**. The platform ensures fair pricing, reliable supply, and transparent communication between vendors and wholesalers.  
+**StreetEats** is a simple and user-friendly dashboard designed to help **small street vendors** manage their **vegetable stock values** and directly connect with **suppliers**. The platform ensures fair pricing, reliable supply, and transparent communication between vendors and wholesalers.  
 
 ---
 
